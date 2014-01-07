@@ -27,6 +27,7 @@
     <audio id='song' controls autoplay=true hidden=true>
       <source src="e6.mp3" type="audio/mpeg">
     </audio>
+    <img id='loading' />
     <div id='vibration'></div>
     <div id='doEvent'></div>
     <div id='deltahistory'>deltahistory = nulllll</div>
@@ -57,17 +58,12 @@
     function init() {
         // enable vibration support
         navigator.vibrate = navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate;
-     
-        if (navigator.vibrate) {
-            <!-- navigator.vibrate(1000); -->
-            document.getElementById("vibration").innerHTML = "Yaybration!";
-        } else {
-            document.getElementById("vibration").innerHTML = "Vibration not supported.";
-        }
-    
+         
         if (window.DeviceOrientationEvent
         //&& navigator.vibrate
         ) {
+			navigator.vibrate(75);
+			
             document.getElementById("doEvent").innerHTML = "DeviceOrientation";
             // Listen for the deviceorientation event and handle the raw data
             window.addEventListener('deviceorientation', function(eventData) {
@@ -134,11 +130,11 @@ console.log('historysum = ' + historysum);
         document.getElementById("loading").src = 'loading.gif';
         
         return $.ajax({ type: "GET",
-            url: "http://sean.hexault.com/perq/get_anagram_words.php?" + "acbdefg",
+            url: "synco.php",
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             async: false
-        }).responseText;    
+        }).responseText;
     }
 </script>
 </body> 
