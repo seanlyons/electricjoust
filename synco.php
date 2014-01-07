@@ -135,7 +135,7 @@ console.log('historysum = ' + historysum);
     
     function synco() {
         return $.ajax({ type: "GET",
-            url: "http://sean.hexault.com/perq/get_anagram_words.php?" + "acbdefg",
+            url: "/get_anagram_words.php?" + "acbdefg",
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             async: false
