@@ -24,16 +24,14 @@
     <button onclick="gameOver(5)" type="button">Game Over</button>
     <!--button id="changespeed" onclick="setPlaySpeed()" type="button">Set audio to be play in slow motion</button-->
     <br> 
-    <!--audio id='song' controls>
+    <audio id='song' controls autoplay=true hidden=true>
       <source src="e6.mp3" type="audio/mpeg">
-      Not supported on your device or browser.  Sorry. (a)
-    </audio-->
-    <br/><br/><br/><br/><br/><br/>
+    </audio>
     <div id='vibration'></div>
     <div id='doEvent'></div>
-    <div id='deltahistory'>nulllll</div>
-    <div id='historysum'>0</div>
-    <div id='difference'>0</div>
+    <div id='deltahistory'>deltahistory = nulllll</div>
+    <div id='historysum'>historysum = 0</div>
+    <div id='difference'>difference = 0</div>
 </div>
 <div id='gameover'>bye</div>
 <script>
@@ -44,9 +42,6 @@
     init();
     deltahistory = [0,0,0,0,0];
 
-    function getPlaySpeed() { 
-        alert(song.playbackRate);
-    } 
 
     function setPlaySpeed() {
         if (song.playbackRate == 0.5) { 
@@ -70,7 +65,9 @@
             document.getElementById("vibration").innerHTML = "Vibration not supported.";
         }
     
-        if (window.DeviceOrientationEvent) {
+        if (window.DeviceOrientationEvent
+        //&& navigator.vibrate
+        ) {
             document.getElementById("doEvent").innerHTML = "DeviceOrientation";
             // Listen for the deviceorientation event and handle the raw data
             window.addEventListener('deviceorientation', function(eventData) {
@@ -130,10 +127,12 @@ console.log('historysum = ' + historysum);
         //Display gameover
         document.getElementById("gameover").style.display = 'inherit';
         document.getElementById("gameover").style.background = 'green';
-        document.getElementById("gameover").innerHTML = synco();
+        document.getElementById("gameover").innerHTML = 'GAMEOVER';
     }
     
     function synco() {
+        document.getElementById("loading").src = 'loading.gif';
+        
         return $.ajax({ type: "GET",
             url: "http://sean.hexault.com/perq/get_anagram_words.php?" + "acbdefg",
             contentType: "application/json; charset=utf-8",
