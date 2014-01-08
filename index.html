@@ -1,6 +1,7 @@
 <!DOCTYPE html> 
-<html> 
+<html>
 <head>
+	<title>Ludwig van Beatoverhead</title>
 	<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
 	<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
   <style type="text/css">
@@ -24,7 +25,7 @@
     <button onclick="gameOver(5)" type="button">Game Over</button>
     <!--button id="changespeed" onclick="setPlaySpeed()" type="button">Set audio to be play in slow motion</button-->
     <br> 
-    <audio id='song' controls autoplay=true hidden=true>
+    <audio id='song' controls hidden=true>
       <source src="e6.mp3" type="audio/mpeg">
     </audio>
     <img id='loading' />
@@ -34,7 +35,9 @@
     <div id='historysum'>historysum = 0</div>
     <div id='difference'>difference = 0</div>
 </div>
-<div id='gameover'>bye</div>
+<div id='gameover'>
+	bye
+</div>
 <script>
     song = document.getElementById("song");
     pbr = 1;
@@ -42,7 +45,10 @@
     delta = 0;
     init();
     deltahistory = [0,0,0,0,0];
-
+	<!-- s1_t = 0; -->
+	<!-- s1_v = 0; -->
+	<!-- s2_t = 0; -->
+	<!-- s2_v = 0; -->
 
     function setPlaySpeed() {
         if (song.playbackRate == 0.5) { 
@@ -63,6 +69,8 @@
         //&& navigator.vibrate
         ) {
 			navigator.vibrate(75);
+			<!-- s1_t = Date().getTime(); -->
+			<!-- s2_t = Date().getTime() - 1; -->
 			
             document.getElementById("doEvent").innerHTML = "DeviceOrientation";
             // Listen for the deviceorientation event and handle the raw data
@@ -94,24 +102,29 @@
             delta_msg = "orientation: was " + old + ", now is " + current + ' >>> ' + delta;
             old = current;
 
-            deltahistory.shift()
-            deltahistory.push(delta)
+            deltahistory.shift();
+            deltahistory.push(delta);
             document.getElementById("deltahistory").innerHTML = deltahistory;
             
+			document.getElementById("difference").innerHTML = delta_msg;
+			
             for (i = 0; i <= deltahistory.length; i++) {
                 historysum += deltahistory[0];
             }
-            document.getElementById("historysum").innerHTML = historysum;
         }
-console.log('historysum = ' + historysum);
         if (historysum > 25 && pbr == 1) {
             //document.getElementById("gameover").innerHTML = 'GAMEOVER';
             gameOver(historysum);
         } else {
-            document.getElementById("difference").innerHTML = delta_msg;
+            computeHighest(historysum);
         }
-
     }
+	
+	function computeHighest(historysum) {
+		document.getElementById("historysum").innerHTML = historysum;
+		<!-- if ( == 0) -->
+	}
+	
     // Some other fun rotations to try...
     //var rotation = "rotate3d(0,1,0, "+ (tiltLR*-1)+"deg) rotate3d(1,0,0, "+ (tiltFB*-1)+"deg)";
     //var rotation = "rotate("+ tiltLR +"deg) rotate3d(0,1,0, "+ (tiltLR*-1)+"deg) rotate3d(1,0,0, "+ (tiltFB*-1)+"deg)";
@@ -124,6 +137,9 @@ console.log('historysum = ' + historysum);
         document.getElementById("gameover").style.display = 'inherit';
         document.getElementById("gameover").style.background = 'green';
         document.getElementById("gameover").innerHTML = 'GAMEOVER';
+		
+		snd = new Audio("gameover.ogg"); // buffers automatically when created
+		snd.play();		
     }
     
     function synco() {
