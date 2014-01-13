@@ -29,11 +29,12 @@
       <source src="e6.mp3" type="audio/mpeg">
     </audio>
     <img id='loading' />
-    <div id='vibration'></div>
-    <div id='doEvent'></div>
+    <div id='vibration'>vibe</div>
+    <div id='doEvent'>doevent</div>
     <div id='deltahistory'>deltahistory = nulllll</div>
     <div id='historysum'>historysum = 0</div>
     <div id='difference'>difference = 0</div>
+    <div id='now'>now = 0</div>
 </div>
 <div id='gameover'>
 	bye
@@ -45,11 +46,8 @@
     delta = 0;
     init();
     deltahistory = [0,0,0,0,0];
-	<!-- s1_t = 0; -->
-	<!-- s1_v = 0; -->
-	<!-- s2_t = 0; -->
-	<!-- s2_v = 0; -->
-
+	recent = {};
+	
     function setPlaySpeed() {
         if (song.playbackRate == 0.5) { 
             pbr = 1;
@@ -69,8 +67,18 @@
         //&& navigator.vibrate
         ) {
 			navigator.vibrate(75);
-			<!-- s1_t = Date().getTime(); -->
-			<!-- s2_t = Date().getTime() - 1; -->
+			now_ms = new Date().getTime();
+			now = Math.floor(now_ms) / 1000;
+            
+			recent = {
+				"1s_ago": now,
+				"2s_ago": now - 1,
+				"highest_1s": 0,
+				"highest_2s": 0
+			};
+			document.getElementById("historysum").innerHTML = recent["highest_1s"];
+			document.getElementById("historysum").innerHTML = call({'ts':now_ms});
+			//document.getElementById("historysum").innerHTML = recent["1s_ago"] + ':' + recent["highest_1s"] + ' & ' + recent["2s_ago"] + ':' + recent["highest_2s"];
 			
             document.getElementById("doEvent").innerHTML = "DeviceOrientation";
             // Listen for the deviceorientation event and handle the raw data
@@ -105,9 +113,8 @@
             deltahistory.shift();
             deltahistory.push(delta);
             document.getElementById("deltahistory").innerHTML = deltahistory;
-            
 			document.getElementById("difference").innerHTML = delta_msg;
-			
+
             for (i = 0; i <= deltahistory.length; i++) {
                 historysum += deltahistory[0];
             }
@@ -115,14 +122,29 @@
         if (historysum > 25 && pbr == 1) {
             //document.getElementById("gameover").innerHTML = 'GAMEOVER';
             gameOver(historysum);
-        } else {
-            computeHighest(historysum);
+        } else if (historysum > 1) {
+            //computeHighest(historysum);
         }
     }
 	
 	function computeHighest(historysum) {
-		document.getElementById("historysum").innerHTML = historysum;
-		<!-- if ( == 0) -->
+		now = Math.floor((new Date().getTime()) / 1000);
+        now_elem = document.getElementById("now");
+        if (now_elem.innerHTML != now) {
+            now_elem.innerHTML = now;
+        }
+		if (historysum > recent["highest_1s"]) {
+			recent["highest_1s"] = historysum;
+			document.getElementById("historysum").innerHTML = recent["highest_1s"];
+		}
+		if (now > recent["1s_ago"]) {
+			recent["2s_ago"] = now - 1;
+			recent["highest_2s"] = recent["highest_1s"];
+			recent["1s_ago"] = now;
+			document.getElementById("historysum").innerHTML = recent["highest_1s"];
+		}
+					
+		
 	}
 	
     // Some other fun rotations to try...
@@ -142,17 +164,51 @@
 		snd.play();		
     }
     
-    function synco() {
-        document.getElementById("loading").src = 'loading.gif';
+    function call( arg ) {
+        //document.getElementById("loading").src = 'loading.gif';
         
+        if (arg) {
+            url = 'synco.php?' + encodeQueryData( arg );
+        } else {
+            url = 'synco.php';
+        }
         return $.ajax({ type: "GET",
-            url: "synco.php",
+            url: url,
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             async: false
         }).responseText;
     }
+    
+    // Usage:
+    //   var data = { 'first name': 'George', 'last name': 'Jetson', 'age': 110 };
+    //   var querystring = encodeQueryData(data);
+    // 
+    function encodeQueryData(data)
+    {
+       var ret = [];
+       for (var d in data)
+          ret.push(encodeURIComponent(d) + "=" + encodeURIComponent(data[d]));
+       return ret.join("&");
+    }
+
+    function pushRequest() {
+        return $.ajax({ type: "GET",
+            url: 'push_request.php',
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            async: false.
+            complete: function(data, meta) {
+
+                //It's long-polling time! Kick off another pushRequest, which will wait for the next incoming push from the server.
+                pushRequest();
+            }, 
+            error: function(error) {
+            
+            }
+        });
+    }
+    
 </script>
 </body> 
 </html>
-
