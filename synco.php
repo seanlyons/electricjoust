@@ -28,12 +28,14 @@ class Synco {
         /************************************************************/
         
         $db = new Db();
-        $query = $db->generateQuery('select', 'long_poll_command_queue', NULL, array('client_sid' => $_SESSION['user_sid']));
-        $results = $db->performQuery( $query );
-        
-        
-        
-        /************************************************************/
+        //Get all results from command queue
+		$args = array('client_sid' => $_SESSION['user_sid'], 'acknowledged' => 0);
+		$results = $db->cmd('select', 'long_poll_command_queue', NULL, $args);
+        //Get the oldest unacknowledged result from the command queue
+		
+		
+		
+		/************************************************************/
 	
 	
 		$response = array('beep' => 'boop');
