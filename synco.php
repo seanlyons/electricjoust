@@ -29,11 +29,15 @@ class Synco {
         
         $db = new Db();
         //Get all results from command queue
-		$args = array('client_sid' => $_SESSION['user_sid'], 'acknowledged' => 0);
-		$results = $db->cmd('select', 'long_poll_command_queue', NULL, $args);
+
+		$details['verb'] = 'select';
+		$details['actor'] = 'long_poll_command_queue';
+		$details['relevant'] = NULL;
+		$details['id_key'] = array('client_sid' => $_SESSION['user_sid'], 'acknowledged' => 0);
+		$details['limit'] = 1;
+		
+		$results = $db->cmd( $details );
         //Get the oldest unacknowledged result from the command queue
-		
-		
 		
 		/************************************************************/
 	
